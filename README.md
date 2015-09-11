@@ -8,7 +8,7 @@ npm install
 grunt
 
 # Prepare to run pollbot
-Rename data/sample.bot.json to data/bot.json.
+Rename data/MegaPollbot/sample.bot.json to data/MegaPollbot/bot.json.
 Open and replace "token" value "xxxxxxxxxxxx" to your bot token.
 
 # Run
