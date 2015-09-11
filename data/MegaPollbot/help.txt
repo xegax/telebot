@@ -1,0 +1,14 @@
+newpoll - Create a new poll
+title - Set the active poll title
+add - Add an option to the active poll
+show - Show results
+showfull - Show results with the user answers
+endpoll - Finish the poll and show results
+help - Show help
+
+example 1:
+ /newpoll some poll title
+ /add option 1
+ /add option 2
+ /add option 3
+ /show

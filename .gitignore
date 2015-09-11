@@ -1,0 +1,6 @@
+node_modules
+.tscache
+build
+data/*/statistics.json
+data/*/state.json
+data/*/bot.json
