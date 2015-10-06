@@ -5,22 +5,44 @@ import timer = require('./mytimer');
 import cmn = require('./common');
 import mfs = require('./FS');
 
+export class TelegramApi {
+  private bot: telebot.TeleBot;
+  private chatId: number;
+  
+  constructor(bot: telebot.TeleBot, chatId: number) {
+    this.bot = bot;
+    this.chatId = chatId;
+  }
+  
+  sendToGroup(msg: string) {
+    this.bot.createMessage(msg, this.chatId).send();
+  }
+  
+  sendToUser(msg: string, user: Telegram.Bot.User) {
+    this.bot.createMessage(msg, user.id).send();
+  }
+}
+
 export class GroupChat {
-    private senderFunc: (msg: string) => void;
     fs: mfs.FS;
+    telegram: TelegramApi;
     
     constructor() {
     }
     
     send(msg: string) {
-        this.senderFunc && this.senderFunc(msg);
+        this.telegram && this.telegram.sendToGroup(msg);
     }
     
-    setSenderFunc( func ) {
-        this.senderFunc = func;
+    sendTo(msg: string, user: Telegram.Bot.User) {
+      this.telegram && this.telegram.sendToUser(msg, user);
     }
     
-    onCommand(msg: cmddesc.CommandDesc, userId?: Telegram.Bot.User): string {
+    setTelegramApi( telegram ) {
+        this.telegram = telegram;
+    }
+    
+    onCommand(msg: cmddesc.CommandDesc, user?: Telegram.Bot.User): string {
         return null;
     }
     
@@ -70,11 +92,11 @@ export class GroupChatContainer {
 export class BotChatAggregator {
     map: mm.MyMap<number, GroupChatContainer> = new mm.MyMap<number, GroupChatContainer>();
     bot: telebot.TeleBot;
-    createGroupChat: () => GroupChat;
+    createGroupChat: (jsonConfig: any) => GroupChat;
     name: string;
     fs: mfs.FS;
     
-    constructor(name: string, bot: telebot.TeleBot, gcCreator: () => GroupChat, fs: mfs.FS) {
+    constructor(name: string, bot: telebot.TeleBot, gcCreator: (jsonConfig: any) => GroupChat, fs: mfs.FS) {
         this.fs = fs;
         this.bot = bot;
         this.name = name;
@@ -146,7 +168,6 @@ export class BotChatAggregator {
                     return;
                 
                 console.log('loading', file);
-                    
                 var json = this.fs.readJSON(file);
                 
                 var gcc = new GroupChatContainer(this.newGroupChat(chatId));
@@ -164,8 +185,8 @@ export class BotChatAggregator {
     }
     
     private newGroupChat(chatId) {
-        var gc = this.createGroupChat();
-        gc.setSenderFunc(this.getSenderFunc(chatId));
+        var gc = this.createGroupChat(this.fs.readJSON('bot.json'));
+        gc.setTelegramApi(new TelegramApi(this.bot, chatId));
         gc.fs = this.fs;
         return gc;
     }

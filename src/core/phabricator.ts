@@ -71,10 +71,13 @@ export class Phabricator {
     }
     
     requestGET(url, callback) {
-        return request.get({
-            url: url,
-            headers: {'Cookie': 'phsid=' + this.phsid + '; phusr=' + this.phusr + ';'}
-        }, function(err, req, content) {
+        var opts: any = {
+          url: url,
+          gzip: true,
+          headers: {'Cookie': 'phsid=' + this.phsid + '; phusr=' + this.phusr + ';'}
+        };
+
+        return request.get(opts, function(err, req, content) {
             callback(content, req);
         });
     }

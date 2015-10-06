@@ -73,6 +73,18 @@ export class SendMessageParams extends Params {
         return this;
     }
     
+    markdown(enable: boolean): SendMessageParams {
+      this.obj_.parse_mode = enable?'Markdown':null;
+      return this;
+    }
+    
+    keyboard(buttons: string[]) {
+      var kb: Telegram.Bot.ReplyKeyboardMarkup = this.obj_.reply_markup || {};
+      kb.keyboard = buttons;
+      this.obj_.reply_markup = kb;
+      return this;
+    }
+    
     get(): any {
         return this.obj_;
     }

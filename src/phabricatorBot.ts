@@ -86,20 +86,36 @@ class ListenerCollection extends PhabricatorListener {
   }
 }
 
+var watcher: PhabricatorWatcher;
 var listeners = new ListenerCollection();
-var watcher = new PhabricatorWatcher();
-watcher.setListener(listeners).start();
 
 class PhabricatorBot extends GroupChat {
   subscribed: boolean = false;
   listener: (msgs: string) => void;
   
-  constructor() {
+  constructor(jsonConfig: any) {
     super();
     
     var self = this;
     this.listener = function(msg: string) {
       self.send(msg);
+    }
+    
+    if (!watcher) {
+      var phabricator = jsonConfig.phabricator;
+      if (!phabricator)
+        throw '"phabricator" not found in bot.json';
+      
+      var user = phabricator.user;
+      if (!user)
+        throw '"phabricator.user" not found in bot.json';
+      
+      var token = phabricator.token;
+      if (!token)
+        throw '"phabricator.token" not found in bot.json';
+      
+      watcher = new PhabricatorWatcher(user, token);
+      watcher.setListener(listeners).start();
     }
   }
   
@@ -120,8 +136,8 @@ class PhabricatorBot extends GroupChat {
     return '';
   }
   
-  static create(): PhabricatorBot {
-    return new PhabricatorBot();
+  static create(jsonConfig: any): PhabricatorBot {
+    return new PhabricatorBot(jsonConfig);
   }
   
   save(): any {

@@ -47,9 +47,17 @@ module Telegram {
         export interface SendMessage {
             chat_id: number;
             text: string;
+            parse_mode?: string;
             disable_web_page_preview?: number;
             reply_to_message_id?: number;
             reply_markup?: any;
+        }
+        
+        export interface ReplyKeyboardMarkup {
+          keyboard: string[];
+          resize_keyboard?: boolean;
+          one_time_keyboard?: boolean;
+          selective?: boolean;
         }
         
         export interface SendPhoto {

@@ -1,6 +1,7 @@
 import phb = require('./phabricator');
 import mm = require('./mymap');
 import timer = require('./mytimer');
+import d3 = require('d3');
 
 export class PhabricatorListener {
     requestCounter: number = 0;
@@ -73,13 +74,13 @@ export class PhabricatorWatcher {
     private api = null;
     private listener: PhabricatorListener = new PhabricatorListener();
     private timer;
-    private delayMs = 5000;
     private revisions = new mm.MyMap<string, phb.Revision>();
     private requestCounter: number = 0;
     private run: boolean;
+    private timeScale = d3.scale.linear<number>().domain([0, 10, 10, 20, 20, 24]).range([120, 120, 5, 5, 120, 120]);
     
     constructor(user?, token?) {
-        this.api = new phb.Phabricator(user || 'kozlov', token || 'lvfwnlsve5zl2j2lnuvkzcjyetsp3ylfnmxtqybz');
+        this.api = new phb.Phabricator(user, token);
     }
 
     setListener(listener: PhabricatorListener) {
@@ -102,12 +103,7 @@ export class PhabricatorWatcher {
         this.timer = null;
         this.run = false;
     }
-    
-    setDelay(delayMs) {
-        this.delayMs = delayMs;
-        return this;
-    }
-    
+        
     private delayedRequest(delayMs) {
         var self = this;
         this.timer = timer.setTimeout(function() {
@@ -120,7 +116,8 @@ export class PhabricatorWatcher {
                     self.requestCounter++;
                     self.listener && (self.listener.requestCounter = self.requestCounter);
                     
-                    self.run && self.delayedRequest(self.delayMs);
+                    var hour = new Date().getHours();
+                    self.run && self.delayedRequest(self.timeScale(hour) * 1000);
                 });
             } catch(e) {
                 self.onError(e);

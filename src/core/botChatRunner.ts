@@ -8,7 +8,7 @@ export class Runner {
     private name: string;
     private fs: mfs.FS;
     
-    constructor(name: string, groupCreator: () => botAgg.GroupChat, botToken?: string) {
+    constructor(name: string, groupCreator: (jsonConfig: any) => botAgg.GroupChat, botToken?: string) {
         this.fs = new mfs.FS(['data', name].join('/'));
         this.name = name;
         
