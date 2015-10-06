@@ -9,7 +9,7 @@ grunt
 
 # Prepare to run pollbot
 Rename data/MegaPollbot/sample.bot.json to data/MegaPollbot/bot.json.
-Open and replace "token" value "xxxxxxxxxxxx" to your bot token.
+Open it and replace "token" value "xxxxxxxxxxxx" to your bot token.
 
 # Run
 pollbot.cmd
